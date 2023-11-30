@@ -87,7 +87,7 @@
             </div>
           </div>
           <br />
-          <button class="button" @click="handleDownloadButton">Download</button>
+          <button :disabled="canDownload" class="button" @click="handleDownloadButton">Download</button>
         </div>
       </div>
     </section>

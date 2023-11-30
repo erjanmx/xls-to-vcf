@@ -50,6 +50,9 @@ new Vue({
         return this.data.slice(-1)[0];
       }
     },
+    canDownload() {
+        return !this.fields.some(item => item.values.length);
+    }
   },
   methods: {
     readFile() {
@@ -82,9 +85,9 @@ new Vue({
         result += `VERSION:3.0\r\n`;
 
         for (const item of self.fields) {
-          if (item.value) {
+          if (item.values) {
             let value = "";
-            for (const v of item.value) {
+            for (const v of item.values) {
               value += " " + contact[v];
             }
             result += `${item.code}:${value.trim()}\r\n`;
