@@ -34,25 +34,17 @@ new Vue({
   },
   computed: {
     tableHeaders() {
-      if (this.data.length > 0) {
-        return Object.keys(this.data[0]);
-      }
-      return [];
+      return this.data.length ? Object.keys(this.data[0]) : [];
     },
     firstThreeRows() {
-      if (this.data.length > 0) {
-        return this.data.slice(0, 3);
-      }
-      return [];
+      return this.data.length ? this.data.slice(0, 3) : [];
     },
     lastRow() {
-      if (this.data.length > 0) {
-        return this.data.slice(-1)[0];
-      }
+      return this.data.slice(-1)[0];
     },
     canDownload() {
-        return !this.fields.some(item => item.values.length);
-    }
+      return !this.fields.some((item) => item.values.length);
+    },
   },
   methods: {
     readFile() {
@@ -81,21 +73,16 @@ new Vue({
       let result = "";
 
       this.data.forEach((contact) => {
-        result += `BEGIN:VCARD\r\n`;
-        result += `VERSION:3.0\r\n`;
+        result += `BEGIN:VCARD\r\nVERSION:3.0\r\n`;
 
-        for (const item of self.fields) {
-          if (item.values) {
-            let value = "";
-            for (const v of item.values) {
-              value += " " + contact[v];
-            }
-            result += `${item.code}:${value.trim()}\r\n`;
+        for (const field of self.fields) {
+          if (field.values.length) {
+            const value = field.values.map((v) => contact[v]).join(" ");
+            result += `${field.code}:${value.trim()}\r\n`;
           }
         }
         result += `END:VCARD\r\n\r\n`;
       });
-
       return result;
     },
   },
