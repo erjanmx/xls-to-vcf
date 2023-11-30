@@ -1,179 +1,101 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>XLS to VCF</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.mini.min.js"></script>
-    <script src="https://unpkg.com/vue-multiselect@2.1.6"></script>
-    <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.6/dist/vue-multiselect.min.css">
-  </head>
-  <body>
-    <div id="app" class="container is-fluid is-widescreen">
-      <section class="section">
-        <div class="content">
-          <h1 class="title">
-            XLS to VCF
-          </h1>
-          <a id="downloadLink" style="display: none">Download VCF</a>
-          <div class="columns is-vcentered">
-            <div class="column is-3">
-              <div class="file">
-                <label class="file-label">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XLS to VCF</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="https://unpkg.com/vue-multiselect@2.1.6"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.mini.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.6/dist/vue-multiselect.min.css">
+</head>
+
+<body>
+  <div id="app" class="container is-fluid is-widescreen">
+    <section class="section">
+      <div class="content">
+        <h1 class="title">
+          XLS to VCF
+        </h1>
+        <a id="downloadLink" style="display: none">Download VCF</a>
+        <div class="columns is-vcentered">
+          <div class="column is-3">
+            <div class="file">
+              <label class="file-label">
                 <input class="file-input" ref="file" type="file" name="file" @change="readFile()">
                 <span class="file-cta">
-                <span class="file-icon">
-                <i class="fas fa-upload"></i>
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">Choose a file…</span>
                 </span>
-                <span class="file-label">Choose a file…</span>
-                </span>
-                </label>
-              </div>
-            </div>
-            <div class="column">
-              {{ filename }}
+              </label>
             </div>
           </div>
-          <div v-show="data.length">
-            <h3>Table data</h3>
-            <div class="table-container">
-              <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-                <thead>
-                  <th>#</th>
-                  <th v-for="(header, key) in tableHeaders">{{ header }}</th>
-                </thead>
-                <tr v-for="(row, index) in firstThreeRows" :key="index">
-                  <td>{{ index + 1 }}</td>
-                  <td v-for="(header, key) in tableHeaders" :key="key">{{ row[header] || '' }}</td>
-                </tr>
-                <tr v-if="data.length > 4">
-                  <td colspan="100">...</td>
-                </tr>
-                <tr v-if="data.length > 3">
-                  <td>{{ data.length }}</td>
-                  <td v-for="(header, key) in tableHeaders" :key="key">{{ lastRow[header] || '' }}</td>
-                </tr>
-              </table>
-            </div>
-            <h3>Mapping</h3>
-            <div v-for="(field, index) in fields" >
-              <div class="columns is-vcentered">
-                <div class="column is-one-fifth">
-                  <label class="">{{ field.description }}:</label>
-                </div>
-                <div class="column">
-                  <multiselect :key="index" v-model="field.value" :options="tableHeaders" :multiple="true" :close-on-select="false" :clear-on-select="false" placeholder="Select fields or leave empty">
-                </div>
+          <div class="column">
+            {{ filename }}
+          </div>
+        </div>
+        <div v-show="data.length">
+          <h3>Table data</h3>
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+              <thead>
+                <th>#</th>
+                <th v-for="(header, key) in tableHeaders">{{ header }}</th>
+              </thead>
+              <tr v-for="(row, index) in firstThreeRows" :key="index">
+                <td>{{ index + 1 }}</td>
+                <td v-for="(header, key) in tableHeaders" :key="key">{{ row[header] || '' }}</td>
+              </tr>
+              <tr v-if="data.length > 4">
+                <td colspan="100">...</td>
+              </tr>
+              <tr v-if="data.length > 3">
+                <td>{{ data.length }}</td>
+                <td v-for="(header, key) in tableHeaders" :key="key">{{ lastRow[header] || '' }}</td>
+              </tr>
+            </table>
+          </div>
+          <h3>Mapping</h3>
+          <div v-for="(field, index) in fields">
+            <div class="columns is-vcentered">
+              <div class="column is-one-fifth">
+                <label class="">{{ field.description }}:</label>
+              </div>
+              <div class="column">
+                <multiselect :key="index" v-model="field.values" :options="tableHeaders" :multiple="true"
+                  placeholder="Select fields or leave empty">
               </div>
             </div>
-            <br/>
-            <div class="content">
-              <h3>Preview of the first {{ firstThreeRows.length }} rows</h3>
-              <div class="tile is-ancestor">
-                <div class="tile is-vertical is-12">
-                  <div class="tile">
-                    <div v-for="(row, index) in firstThreeRows" :key="index"  class="tile is-parent">
-                      <article class="tile is-child notification">
-                        <div v-for="(field, i) in fields">
-                          <span v-show="field.value" class="small">{{ field.description}}: </span>
-                          <span v-for="val in field.value" class="small"> {{ row[val] }} </span>
-                        </div>
-                      </article>
-                    </div>
+          </div>
+          <br />
+          <div class="content">
+            <h3>Preview of the first {{ firstThreeRows.length }} rows</h3>
+            <div class="tile is-ancestor">
+              <div class="tile is-vertical is-12">
+                <div class="tile">
+                  <div v-for="(row, index) in firstThreeRows" :key="index" class="tile is-parent">
+                    <article class="tile is-child notification">
+                      <div v-for="(field, i) in fields">
+                        <span v-show="field.values.length" class="small">{{ field.description}}: </span>
+                        <span v-for="val in field.values" class="small"> {{ row[val] }} </span>
+                      </div>
+                    </article>
                   </div>
                 </div>
               </div>
             </div>
-            <br/>
-            <button class="button" @click="handleDownloadButton">Download</button>
           </div>
+          <br />
+          <button class="button" @click="handleDownloadButton">Download</button>
         </div>
-      </section>
-      <script>
-        Vue.component('multiselect', window.VueMultiselect.default)
-        new Vue({
-          el: '#app',
-          data: {
-            data: [],
-            filename: '',
-            fields: [
-              { code: 'N', description: 'First name', values: []},
-              { code: 'N_FAMILY', description: 'Last name', values: ''},
-              { code: 'TEL;TYPE=VOICE,CELL;VALUE=text', description: 'Mobile phone', values: []},
-              { code: 'TEL;TYPE=VOICE,WORK;VALUE=text', description: 'Work tel', values: []},
-              { code: 'TEL;TYPE=VOICE,HOME;VALUE=text', description: 'Home tel', values: []},
-              { code: 'EMAIL;TYPE=HOME;TYPE=pref;TYPE=INTERNET', description: 'E-Mail', values: []},
-              { code: 'ORG', description: 'Company', values: []},
-              { code: 'TITLE', description: 'Title', values: []},
-              { code: 'NOTE', description: 'Notes', values: []},
-            ],
-          },
-          computed: {
-            tableHeaders() {
-              if (this.data.length > 0) {
-                return Object.keys(this.data[0]);
-              }
-              return [];
-            },
-            firstThreeRows() {
-              if (this.data.length > 0) {
-                return this.data.slice(0, 3);
-              }
-              return [];
-            },
-            lastRow() {
-              if (this.data.length > 0) {
-                return this.data.slice(-1)[0];
-              }
-            },
-          },
-          methods: {
-            readFile() {
-              let self = this;
-              const file = this.$refs.file.files[0]
-              self.filename = file.name;
-              const reader = new FileReader();
-              reader.onload = function (e) {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
-                self.data = XLSX.utils.sheet_to_json(sheet);
-              };
-              reader.readAsArrayBuffer(file);
-            },
-            handleDownloadButton() {
-              const blob = new Blob([this.buildVcf()], { type: 'text/vcard' });
-              downloadLink.href = URL.createObjectURL(blob);
-              downloadLink.download = 'contacts.vcf';
-              downloadLink.click();
-            },
-            buildVcf() {
-              let self = this;
-              let result = '';
+      </div>
+    </section>
+  </div>
+</body>
+<script src="js/app.js"></script>
 
-              this.data.forEach(contact => {
-                result += `BEGIN:VCARD\r\n`;
-                result += `VERSION:3.0\r\n`;
-
-                for (const item of self.fields) {
-                  if (item.value) {
-                    let value = '';
-                    for (const v of item.value) {
-                      value += ' ' + contact[v];
-                    }
-                    result += `${item.code}:${value.trim()}\r\n`;
-                  }
-                }
-                result += `END:VCARD\r\n\r\n`;
-              });
-
-              return result;
-            }
-          }
-        });
-      </script>
-    </div>
-  </body>
 </html>
