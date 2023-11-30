@@ -150,9 +150,10 @@
               downloadLink.click();
             },
             buildVcf() {
+              let self = this;
               let result = '';
 
-              self.data.forEach(contact => {
+              this.data.forEach(contact => {
                 result += `BEGIN:VCARD\r\n`;
                 result += `VERSION:3.0\r\n`;
 
