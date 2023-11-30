@@ -24,12 +24,9 @@
           <div class="column is-3">
             <div class="file">
               <label class="file-label">
-                <input class="file-input" ref="file" type="file" name="file" @change="readFile()">
+                <input class="file-input" ref="file" type="file" name="file" @change="readFile()" accept=".xls,.xlsx,.csv">
                 <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <span class="file-label">Choose a file…</span>
+                  <span class="file-label">Upload Excel file…</span>
                 </span>
               </label>
             </div>
