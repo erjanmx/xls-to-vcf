@@ -59,10 +59,10 @@
           <div v-for="(field, index) in fields">
             <div class="columns is-vcentered">
               <div class="column is-one-fifth">
-                <label class="">{{ field.description }}:</label>
+                <label :for="index"  class="">{{ field.description }}:</label>
               </div>
               <div class="column">
-                <multiselect :key="index" v-model="field.values" :options="tableHeaders" :multiple="true"
+                <multiselect :id="index" :key="index" v-model="field.values" :options="tableHeaders" :multiple="true"
                   placeholder="Select fields or leave empty">
               </div>
             </div>
